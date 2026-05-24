@@ -1,9 +1,9 @@
 # ESP32-Robot-Pet
-A small robotic pet using an ESP32, a round TFT display, a servo motor and a button.
+A small robotic pet using an ESP32, a round TFT display, a servo motor. 
 
 ## Hardware
 
-| Component | Model / Notes |
+| Component | Notes |
 |---|---|
 | Microcontroller | ESP32 Dev Module with expansion board |
 | Display | 1.28" round TFT, GC9A01 driver, SPI, 240x240 |
