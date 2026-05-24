@@ -2,6 +2,8 @@
 #define DISPLAY_UI_H
 
 void setupDisplay();
-void drawTestScreen(int angle);
+void drawStaticScreen();
+void updateAngleText(int angle);
+void updateStatusText(bool running);
 
 #endif

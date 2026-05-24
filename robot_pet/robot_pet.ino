@@ -4,9 +4,14 @@
 
 int angle = 0;
 bool goingUp = true;
-
 bool running = false;
+
 bool lastButtonState = HIGH;
+unsigned long lastButtonTime = 0;
+unsigned long lastServoTime = 0;
+
+const unsigned long debounceDelay = 250;
+const unsigned long servoInterval = 300;
 
 void setup() {
   Serial.begin(115200);
@@ -16,25 +21,26 @@ void setup() {
   setupDisplay();
   setupServo();
 
-  drawTestScreen(angle);
+  updateAngleText(angle);
+  updateStatusText(running);
 
   Serial.println("Robot Pet test started");
-  Serial.println("Pulsa BOOT para encender/apagar servo");
 }
 
 void loop() {
   bool buttonState = digitalRead(BUTTON_PIN);
 
   if (lastButtonState == HIGH && buttonState == LOW) {
-    running = !running;
+    unsigned long now = millis();
 
-    if (running) {
-      Serial.println("Servo ENCENDIDO");
-    } else {
-      Serial.println("Servo APAGADO");
+    if (now - lastButtonTime > debounceDelay) {
+      running = !running;
+      lastButtonTime = now;
+
+      updateStatusText(running);
+
+      Serial.println(running ? "Servo ON" : "Servo OFF");
     }
-
-    delay(300);
   }
 
   lastButtonState = buttonState;
@@ -43,28 +49,31 @@ void loop() {
     return;
   }
 
-  moveServoTo(angle);
-  drawTestScreen(angle);
+  unsigned long now = millis();
 
-  Serial.print("Angle: ");
-  Serial.println(angle);
+  if (now - lastServoTime >= servoInterval) {
+    lastServoTime = now;
 
-  if (goingUp) {
-    angle += 30;
+    moveServoTo(angle);
+    updateAngleText(angle);
 
-    if (angle >= 180) {
-      angle = 180;
-      goingUp = false;
-    }
+    Serial.print("Angle: ");
+    Serial.println(angle);
 
-  } else {
-    angle -= 30;
+    if (goingUp) {
+      angle += 30;
 
-    if (angle <= 0) {
-      angle = 0;
-      goingUp = true;
+      if (angle >= 180) {
+        angle = 180;
+        goingUp = false;
+      }
+    } else {
+      angle -= 30;
+
+      if (angle <= 0) {
+        angle = 0;
+        goingUp = true;
+      }
     }
   }
-
-  delay(500);
 }
